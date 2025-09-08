@@ -1,0 +1,30 @@
+{
+  "name": "node-red-dashboard-learning",
+  "version": "1.0.0",
+  "description": "Learning Node-RED and Dashboard 2.0 with practical examples",
+  "main": "index.js",
+  "scripts": {
+    "start": "node-red",
+    "dev": "node-red -v",
+    "flows": "node-red flows.json"
+  },
+  "keywords": [
+    "node-red",
+    "dashboard",
+    "iot",
+    "automation",
+    "learning"
+  ],
+  "author": "Learning Project",
+  "license": "MIT",
+  "dependencies": {
+    "node-red": "^3.1.0",
+    "node-red-dashboard": "^3.2.0",
+    "node-red-contrib-ui-led": "^0.4.0",
+    "node-red-contrib-chartjs": "^0.0.8",
+    "node-red-contrib-moment": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

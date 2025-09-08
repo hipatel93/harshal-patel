@@ -1,0 +1,206 @@
+[
+    {
+        "id": "basic-tab",
+        "type": "tab",
+        "label": "Basic Examples",
+        "disabled": false,
+        "info": "Basic Node-RED and Dashboard 2.0 examples"
+    },
+    {
+        "id": "inject-node",
+        "type": "inject",
+        "z": "basic-tab",
+        "name": "Send Message",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Hello World!",
+        "payloadType": "str",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "debug-node",
+                "function-node"
+            ]
+        ]
+    },
+    {
+        "id": "debug-node",
+        "type": "debug",
+        "z": "basic-tab",
+        "name": "Debug Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "function-node",
+        "type": "function",
+        "z": "basic-tab",
+        "name": "Process Message",
+        "func": "// Get the current message payload\nvar input = msg.payload;\n\n// Process the message\nvar timestamp = new Date().toISOString();\nvar processed = {\n    original: input,\n    processed: input.toUpperCase(),\n    timestamp: timestamp,\n    length: input.length\n};\n\n// Update the message\nmsg.payload = processed;\nmsg.topic = \"processed\";\n\n// Return the message\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "debug-processed"
+            ]
+        ]
+    },
+    {
+        "id": "debug-processed",
+        "type": "debug",
+        "z": "basic-tab",
+        "name": "Processed Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "switch-node",
+        "type": "switch",
+        "z": "basic-tab",
+        "name": "Route by Length",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "5",
+                "vt": "num"
+            },
+            {
+                "t": "gte",
+                "v": "5",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "short-message"
+            ],
+            [
+                "long-message"
+            ]
+        ]
+    },
+    {
+        "id": "short-message",
+        "type": "debug",
+        "z": "basic-tab",
+        "name": "Short Message",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "long-message",
+        "type": "debug",
+        "z": "basic-tab",
+        "name": "Long Message",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "change-node",
+        "type": "change",
+        "z": "basic-tab",
+        "name": "Add Metadata",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "example",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 280,
+        "wires": [
+            [
+                "debug-metadata"
+            ]
+        ]
+    },
+    {
+        "id": "debug-metadata",
+        "type": "debug",
+        "z": "basic-tab",
+        "name": "With Metadata",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 280,
+        "wires": []
+    }
+]
