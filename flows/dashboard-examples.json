@@ -1,0 +1,371 @@
+[
+    {
+        "id": "dashboard-tab",
+        "type": "tab",
+        "label": "Dashboard Examples",
+        "disabled": false,
+        "info": "Dashboard 2.0 examples with various UI components"
+    },
+    {
+        "id": "ui-base",
+        "type": "ui-base",
+        "z": "dashboard-tab",
+        "name": "Learning Dashboard",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "navigationStyle": "default"
+    },
+    {
+        "id": "ui-tab",
+        "type": "ui-tab",
+        "z": "dashboard-tab",
+        "name": "Home Control",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-group",
+        "type": "ui-group",
+        "z": "dashboard-tab",
+        "name": "Controls",
+        "tab": "ui-tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-display",
+        "type": "ui-group",
+        "z": "dashboard-tab",
+        "name": "Status Display",
+        "tab": "ui-tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-button",
+        "type": "ui-button",
+        "z": "dashboard-tab",
+        "name": "Toggle Light",
+        "group": "ui-group",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Toggle Light",
+        "tooltip": "Click to toggle the light on/off",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "lightbulb",
+        "payload": "toggle",
+        "payloadType": "str",
+        "topic": "light/control",
+        "topicType": "str",
+        "x": 200,
+        "y": 100,
+        "wires": [
+            [
+                "light-function"
+            ]
+        ]
+    },
+    {
+        "id": "light-function",
+        "type": "function",
+        "z": "dashboard-tab",
+        "name": "Process Light Control",
+        "func": "// Get the current light state from context\nvar currentState = context.get('lightState') || false;\n\n// Toggle the state\nvar newState = !currentState;\n\n// Store the new state\ncontext.set('lightState', newState);\n\n// Prepare the message\nmsg.payload = {\n    state: newState,\n    timestamp: new Date().toISOString(),\n    action: 'toggle'\n};\n\nmsg.topic = 'light/status';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "ui-text-light",
+                "ui-led-light"
+            ]
+        ]
+    },
+    {
+        "id": "ui-text-light",
+        "type": "ui-text",
+        "z": "dashboard-tab",
+        "group": "ui-group-display",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Light Status",
+        "label": "Light Status:",
+        "format": "{{msg.payload.state ? 'ON' : 'OFF'}}",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 18,
+        "color": "{{msg.payload.state ? '#00ff00' : '#ff0000'}}",
+        "className": "",
+        "x": 600,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "ui-led-light",
+        "type": "ui-led",
+        "z": "dashboard-tab",
+        "group": "ui-group-display",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Light LED",
+        "label": "Light",
+        "color": "{{msg.payload.state ? '#00ff00' : '#ff0000'}}",
+        "x": 600,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "ui-slider",
+        "type": "ui-slider",
+        "z": "dashboard-tab",
+        "name": "Temperature Control",
+        "label": "Temperature",
+        "tooltip": "Adjust temperature",
+        "group": "ui-group",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "temperature/set",
+        "topicType": "str",
+        "min": 16,
+        "max": 30,
+        "step": 1,
+        "className": "",
+        "x": 200,
+        "y": 180,
+        "wires": [
+            [
+                "temp-function"
+            ]
+        ]
+    },
+    {
+        "id": "temp-function",
+        "type": "function",
+        "z": "dashboard-tab",
+        "name": "Process Temperature",
+        "func": "// Get the temperature value\nvar temp = msg.payload;\n\n// Store in context\ncontext.set('currentTemp', temp);\n\n// Determine status\nvar status = 'Normal';\nvar color = '#00ff00';\n\nif (temp < 18) {\n    status = 'Cold';\n    color = '#0080ff';\n} else if (temp > 26) {\n    status = 'Hot';\n    color = '#ff8000';\n}\n\n// Prepare message\nmsg.payload = {\n    temperature: temp,\n    status: status,\n    color: color,\n    timestamp: new Date().toISOString()\n};\n\nmsg.topic = 'temperature/status';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "ui-gauge-temp",
+                "ui-text-temp"
+            ]
+        ]
+    },
+    {
+        "id": "ui-gauge-temp",
+        "type": "ui-gauge",
+        "z": "dashboard-tab",
+        "name": "Temperature Gauge",
+        "group": "ui-group-display",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperature",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 16,
+        "max": 30,
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ff8000"
+        ],
+        "seg1": "18",
+        "seg2": "26",
+        "className": "",
+        "x": 600,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ui-text-temp",
+        "type": "ui-text",
+        "z": "dashboard-tab",
+        "group": "ui-group-display",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "Temperature Status",
+        "label": "Status:",
+        "format": "{{msg.payload.status}}",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 16,
+        "color": "{{msg.payload.color}}",
+        "className": "",
+        "x": 600,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ui-switch",
+        "type": "ui-switch",
+        "z": "dashboard-tab",
+        "name": "Fan Control",
+        "label": "Fan",
+        "tooltip": "Turn fan on/off",
+        "group": "ui-group",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": false,
+        "topic": "fan/control",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 200,
+        "y": 260,
+        "wires": [
+            [
+                "fan-function"
+            ]
+        ]
+    },
+    {
+        "id": "fan-function",
+        "type": "function",
+        "z": "dashboard-tab",
+        "name": "Process Fan Control",
+        "func": "// Get the fan state\nvar fanState = msg.payload === 'on';\n\n// Store in context\ncontext.set('fanState', fanState);\n\n// Prepare message\nmsg.payload = {\n    state: fanState,\n    status: fanState ? 'Running' : 'Stopped',\n    timestamp: new Date().toISOString()\n};\n\nmsg.topic = 'fan/status';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 260,
+        "wires": [
+            [
+                "ui-text-fan"
+            ]
+        ]
+    },
+    {
+        "id": "ui-text-fan",
+        "type": "ui-text",
+        "z": "dashboard-tab",
+        "group": "ui-group-display",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "Fan Status",
+        "label": "Fan:",
+        "format": "{{msg.payload.status}}",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 16,
+        "color": "{{msg.payload.state ? '#00ff00' : '#666666'}}",
+        "className": "",
+        "x": 600,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "inject-status",
+        "type": "inject",
+        "z": "dashboard-tab",
+        "name": "Get Status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "status",
+        "payloadType": "str",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "status-function"
+            ]
+        ]
+    },
+    {
+        "id": "status-function",
+        "type": "function",
+        "z": "dashboard-tab",
+        "name": "Get All Status",
+        "func": "// Get all current states from context\nvar lightState = context.get('lightState') || false;\nvar currentTemp = context.get('currentTemp') || 20;\nvar fanState = context.get('fanState') || false;\n\n// Prepare comprehensive status\nmsg.payload = {\n    light: {\n        state: lightState,\n        status: lightState ? 'ON' : 'OFF'\n    },\n    temperature: {\n        value: currentTemp,\n        status: currentTemp < 18 ? 'Cold' : currentTemp > 26 ? 'Hot' : 'Normal'\n    },\n    fan: {\n        state: fanState,\n        status: fanState ? 'Running' : 'Stopped'\n    },\n    timestamp: new Date().toISOString()\n};\n\nmsg.topic = 'system/status';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 320,
+        "wires": [
+            [
+                "ui-template-status"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-status",
+        "type": "ui-template",
+        "z": "dashboard-tab",
+        "group": "ui-group-display",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "System Status",
+        "label": "System Overview",
+        "format": "<div style=\"padding: 10px; background: #f0f0f0; border-radius: 5px;\">\n  <h3>System Status</h3>\n  <p><strong>Light:</strong> <span style=\"color: {{msg.payload.light.state ? '#00ff00' : '#ff0000'}}\">{{msg.payload.light.status}}</span></p>\n  <p><strong>Temperature:</strong> {{msg.payload.temperature.value}}°C ({{msg.payload.temperature.status}})</p>\n  <p><strong>Fan:</strong> <span style=\"color: {{msg.payload.fan.state ? '#00ff00' : '#666666'}}\">{{msg.payload.fan.status}}</span></p>\n  <p><small>Last updated: {{msg.payload.timestamp}}</small></p>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    }
+]

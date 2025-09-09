@@ -1,0 +1,502 @@
+[
+    {
+        "id": "advanced-tab",
+        "type": "tab",
+        "label": "Advanced Examples",
+        "disabled": false,
+        "info": "Advanced Node-RED and Dashboard 2.0 examples with charts, forms, and API integration"
+    },
+    {
+        "id": "ui-base-advanced",
+        "type": "ui-base",
+        "z": "advanced-tab",
+        "name": "Advanced Dashboard",
+        "path": "/advanced",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "navigationStyle": "default"
+    },
+    {
+        "id": "ui-tab-advanced",
+        "type": "ui-tab",
+        "z": "advanced-tab",
+        "name": "Data Visualization",
+        "icon": "chart-line",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-group-charts",
+        "type": "ui-group",
+        "z": "advanced-tab",
+        "name": "Charts & Graphs",
+        "tab": "ui-tab-advanced",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-forms",
+        "type": "ui-group",
+        "z": "advanced-tab",
+        "name": "Forms & Inputs",
+        "tab": "ui-tab-advanced",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-api",
+        "type": "ui-group",
+        "z": "advanced-tab",
+        "name": "API Integration",
+        "tab": "ui-tab-advanced",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "data-generator",
+        "type": "inject",
+        "z": "advanced-tab",
+        "name": "Generate Data",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "sensor-simulator"
+            ]
+        ]
+    },
+    {
+        "id": "sensor-simulator",
+        "type": "function",
+        "z": "advanced-tab",
+        "name": "Sensor Data Simulator",
+        "func": "// Simulate sensor data\nvar timestamp = new Date();\nvar baseTemp = 20;\nvar baseHumidity = 50;\nvar basePressure = 1013;\n\n// Add some randomness\nvar temp = baseTemp + (Math.random() - 0.5) * 10;\nvar humidity = Math.max(0, Math.min(100, baseHumidity + (Math.random() - 0.5) * 20));\nvar pressure = basePressure + (Math.random() - 0.5) * 20;\n\n// Create sensor data object\nvar sensorData = {\n    timestamp: timestamp.toISOString(),\n    temperature: Math.round(temp * 10) / 10,\n    humidity: Math.round(humidity * 10) / 10,\n    pressure: Math.round(pressure * 10) / 10,\n    location: \"Room 1\"\n};\n\nmsg.payload = sensorData;\nmsg.topic = \"sensors/environmental\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "ui-chart-temp",
+                "ui-chart-humidity",
+                "ui-chart-pressure",
+                "data-storage"
+            ]
+        ]
+    },
+    {
+        "id": "ui-chart-temp",
+        "type": "ui-chart",
+        "z": "advanced-tab",
+        "name": "Temperature Chart",
+        "group": "ui-group-charts",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Temperature Over Time",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "No data available",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "pie": {
+            "valueCol": "y",
+            "labelCol": "x",
+            "showLegend": "true"
+        },
+        "className": "",
+        "x": 600,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui-chart-humidity",
+        "type": "ui-chart",
+        "z": "advanced-tab",
+        "name": "Humidity Chart",
+        "group": "ui-group-charts",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Humidity Over Time",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "No data available",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#2ca02c",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "pie": {
+            "valueCol": "y",
+            "labelCol": "x",
+            "showLegend": "true"
+        },
+        "className": "",
+        "x": 600,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui-chart-pressure",
+        "type": "ui-chart",
+        "z": "advanced-tab",
+        "name": "Pressure Chart",
+        "group": "ui-group-charts",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "label": "Pressure Over Time",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "No data available",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#ff7f0e",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "pie": {
+            "valueCol": "y",
+            "labelCol": "x",
+            "showLegend": "true"
+        },
+        "className": "",
+        "x": 600,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "data-storage",
+        "type": "function",
+        "z": "advanced-tab",
+        "name": "Store Data",
+        "func": "// Store data in global context for historical access\nvar data = msg.payload;\nvar history = global.get('sensorHistory') || [];\n\n// Add new data point\nhistory.push(data);\n\n// Keep only last 100 points\nif (history.length > 100) {\n    history = history.slice(-100);\n}\n\n// Store back in global context\nglobal.set('sensorHistory', history);\n\n// Calculate statistics\nvar temps = history.map(h => h.temperature);\nvar avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;\nvar maxTemp = Math.max(...temps);\nvar minTemp = Math.min(...temps);\n\n// Prepare statistics message\nmsg.payload = {\n    current: data,\n    statistics: {\n        averageTemperature: Math.round(avgTemp * 10) / 10,\n        maxTemperature: maxTemp,\n        minTemperature: minTemp,\n        dataPoints: history.length\n    },\n    timestamp: new Date().toISOString()\n};\n\nmsg.topic = 'sensors/statistics';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "ui-template-stats"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-stats",
+        "type": "ui-template",
+        "z": "advanced-tab",
+        "group": "ui-group-charts",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "Statistics Display",
+        "label": "Sensor Statistics",
+        "format": "<div style=\"padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin: 10px 0;\">\n  <h3 style=\"margin-top: 0;\">📊 Sensor Statistics</h3>\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 10px;\">\n    <div>\n      <strong>🌡️ Temperature</strong><br>\n      Current: {{msg.payload.current.temperature}}°C<br>\n      Average: {{msg.payload.statistics.averageTemperature}}°C<br>\n      Range: {{msg.payload.statistics.minTemperature}}°C - {{msg.payload.statistics.maxTemperature}}°C\n    </div>\n    <div>\n      <strong>💧 Humidity</strong><br>\n      Current: {{msg.payload.current.humidity}}%<br>\n      <strong>🌬️ Pressure</strong><br>\n      Current: {{msg.payload.current.pressure}} hPa\n    </div>\n  </div>\n  <div style=\"margin-top: 10px; font-size: 0.9em; opacity: 0.8;\">\n    Data points: {{msg.payload.statistics.dataPoints}} | Last updated: {{msg.payload.timestamp}}\n  </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui-form",
+        "type": "ui-form",
+        "z": "advanced-tab",
+        "name": "Device Configuration",
+        "label": "Configure Device",
+        "group": "ui-group-forms",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "formValue": "{\n  \"deviceName\": \"Sensor Node 1\",\n  \"location\": \"Living Room\",\n  \"samplingRate\": 5,\n  \"alertsEnabled\": true,\n  \"temperatureThreshold\": 25,\n  \"humidityThreshold\": 70\n}",
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "device/config",
+        "topicType": "str",
+        "splitLayout": "",
+        "className": "",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "form-processor"
+            ]
+        ]
+    },
+    {
+        "id": "form-processor",
+        "type": "function",
+        "z": "advanced-tab",
+        "name": "Process Form Data",
+        "func": "// Process form submission\nvar formData = msg.payload;\n\n// Validate and process the form data\nvar config = {\n    deviceName: formData.deviceName || 'Unknown Device',\n    location: formData.location || 'Unknown Location',\n    samplingRate: parseInt(formData.samplingRate) || 5,\n    alertsEnabled: formData.alertsEnabled === true || formData.alertsEnabled === 'true',\n    temperatureThreshold: parseFloat(formData.temperatureThreshold) || 25,\n    humidityThreshold: parseFloat(formData.humidityThreshold) || 70,\n    configuredAt: new Date().toISOString()\n};\n\n// Store configuration in global context\nglobal.set('deviceConfig', config);\n\n// Prepare response message\nmsg.payload = {\n    success: true,\n    message: 'Device configuration updated successfully',\n    config: config\n};\n\nmsg.topic = 'device/config/response';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "ui-notification"
+            ]
+        ]
+    },
+    {
+        "id": "ui-notification",
+        "type": "ui-notification",
+        "z": "advanced-tab",
+        "name": "Config Notification",
+        "group": "ui-group-forms",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "topicType": "str",
+        "okType": "str",
+        "cancelType": "str",
+        "raw": false,
+        "className": "",
+        "x": 600,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "api-request",
+        "type": "inject",
+        "z": "advanced-tab",
+        "name": "Get Weather Data",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "London",
+        "payloadType": "str",
+        "x": 150,
+        "y": 400,
+        "wires": [
+            [
+                "http-request"
+            ]
+        ]
+    },
+    {
+        "id": "http-request",
+        "type": "http request",
+        "z": "advanced-tab",
+        "name": "Weather API",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.openweathermap.org/data/2.5/weather?q={{msg.payload}}&appid=demo&units=metric",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "weather-processor"
+            ]
+        ]
+    },
+    {
+        "id": "weather-processor",
+        "type": "function",
+        "z": "advanced-tab",
+        "name": "Process Weather Data",
+        "func": "// Process weather API response\nvar weather = msg.payload;\n\n// Extract relevant information\nvar weatherData = {\n    city: weather.name,\n    country: weather.sys.country,\n    temperature: Math.round(weather.main.temp * 10) / 10,\n    feelsLike: Math.round(weather.main.feels_like * 10) / 10,\n    humidity: weather.main.humidity,\n    pressure: weather.main.pressure,\n    description: weather.weather[0].description,\n    icon: weather.weather[0].icon,\n    windSpeed: weather.wind.speed,\n    windDirection: weather.wind.deg,\n    timestamp: new Date().toISOString()\n};\n\n// Prepare message for dashboard\nmsg.payload = weatherData;\nmsg.topic = 'weather/current';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 400,
+        "wires": [
+            [
+                "ui-template-weather"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-weather",
+        "type": "ui-template",
+        "z": "advanced-tab",
+        "group": "ui-group-api",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Weather Display",
+        "label": "Current Weather",
+        "format": "<div style=\"padding: 15px; background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 10px; text-align: center;\">\n  <h3 style=\"margin-top: 0;\">🌤️ {{msg.payload.city}}, {{msg.payload.country}}</h3>\n  <div style=\"font-size: 2em; margin: 10px 0;\">{{msg.payload.temperature}}°C</div>\n  <div style=\"text-transform: capitalize; margin-bottom: 15px;\">{{msg.payload.description}}</div>\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;\">\n    <div>💧 Humidity: {{msg.payload.humidity}}%</div>\n    <div>🌬️ Wind: {{msg.payload.windSpeed}} m/s</div>\n    <div>🌡️ Feels like: {{msg.payload.feelsLike}}°C</div>\n    <div>📊 Pressure: {{msg.payload.pressure}} hPa</div>\n  </div>\n  <div style=\"margin-top: 10px; font-size: 0.8em; opacity: 0.8;\">\n    Last updated: {{msg.payload.timestamp}}\n  </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 800,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui-text-input",
+        "type": "ui-text-input",
+        "z": "advanced-tab",
+        "name": "City Input",
+        "label": "Enter City:",
+        "group": "ui-group-api",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": "300",
+        "topic": "weather/city",
+        "topicType": "str",
+        "className": "",
+        "x": 200,
+        "y": 480,
+        "wires": [
+            [
+                "city-validator"
+            ]
+        ]
+    },
+    {
+        "id": "city-validator",
+        "type": "function",
+        "z": "advanced-tab",
+        "name": "Validate City",
+        "func": "// Validate city input\nvar city = msg.payload;\n\n// Basic validation\nif (!city || city.trim().length < 2) {\n    node.warn('Invalid city name');\n    return null;\n}\n\n// Clean and format city name\ncity = city.trim().toLowerCase()\n    .split(' ')\n    .map(word => word.charAt(0).toUpperCase() + word.slice(1))\n    .join(' ');\n\nmsg.payload = city;\nmsg.topic = 'weather/city/validated';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 480,
+        "wires": [
+            [
+                "http-request"
+            ]
+        ]
+    }
+]

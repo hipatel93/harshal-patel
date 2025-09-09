@@ -1,0 +1,640 @@
+[
+    {
+        "id": "smart-home-tab",
+        "type": "tab",
+        "label": "Smart Home Project",
+        "disabled": false,
+        "info": "Complete smart home automation project with Node-RED and Dashboard 2.0"
+    },
+    {
+        "id": "ui-base-smart",
+        "type": "ui-base",
+        "z": "smart-home-tab",
+        "name": "Smart Home Dashboard",
+        "path": "/smarthome",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "navigationStyle": "default"
+    },
+    {
+        "id": "ui-tab-overview",
+        "type": "ui-tab",
+        "z": "smart-home-tab",
+        "name": "Overview",
+        "icon": "home",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-tab-controls",
+        "type": "ui-tab",
+        "z": "smart-home-tab",
+        "name": "Controls",
+        "icon": "sliders-h",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-tab-monitoring",
+        "type": "ui-tab",
+        "z": "smart-home-tab",
+        "name": "Monitoring",
+        "icon": "chart-line",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-tab-settings",
+        "type": "ui-tab",
+        "z": "smart-home-tab",
+        "name": "Settings",
+        "icon": "cog",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-group-overview",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "Home Status",
+        "tab": "ui-tab-overview",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-lights",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "Lighting Control",
+        "tab": "ui-tab-controls",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-climate",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "Climate Control",
+        "tab": "ui-tab-controls",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-security",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "Security",
+        "tab": "ui-tab-controls",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-energy",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "Energy Monitoring",
+        "tab": "ui-tab-monitoring",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui-group-settings",
+        "type": "ui-group",
+        "z": "smart-home-tab",
+        "name": "System Settings",
+        "tab": "ui-tab-settings",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "system-initializer",
+        "type": "inject",
+        "z": "smart-home-tab",
+        "name": "Initialize System",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "init",
+        "payloadType": "str",
+        "x": 200,
+        "y": 100,
+        "wires": [
+            [
+                "init-system"
+            ]
+        ]
+    },
+    {
+        "id": "init-system",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Initialize Smart Home",
+        "func": "// Initialize smart home system with default values\nvar smartHomeState = {\n    lights: {\n        livingRoom: { state: false, brightness: 100, color: '#ffffff' },\n        bedroom: { state: false, brightness: 80, color: '#ffffff' },\n        kitchen: { state: false, brightness: 100, color: '#ffffff' },\n        bathroom: { state: false, brightness: 60, color: '#ffffff' }\n    },\n    climate: {\n        temperature: 22,\n        targetTemp: 22,\n        humidity: 45,\n        fanSpeed: 0,\n        acMode: 'auto'\n    },\n    security: {\n        alarmArmed: false,\n        doorLocked: true,\n        motionDetected: false,\n        lastMotion: null\n    },\n    energy: {\n        currentUsage: 0,\n        dailyUsage: 0,\n        monthlyUsage: 0,\n        solarProduction: 0\n    },\n    system: {\n        lastUpdate: new Date().toISOString(),\n        version: '1.0.0',\n        status: 'online'\n    }\n};\n\n// Store in global context\nglobal.set('smartHomeState', smartHomeState);\n\n// Prepare initialization message\nmsg.payload = {\n    message: 'Smart Home System Initialized',\n    state: smartHomeState\n};\n\nmsg.topic = 'system/initialized';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "ui-template-overview"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-overview",
+        "type": "ui-template",
+        "z": "smart-home-tab",
+        "group": "ui-group-overview",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Home Overview",
+        "label": "Smart Home Status",
+        "format": "<div style=\"padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; margin: 10px 0;\">\n  <h2 style=\"margin-top: 0; text-align: center;\">🏠 Smart Home Dashboard</h2>\n  <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;\">\n    <div style=\"background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center;\">\n      <h3>💡 Lighting</h3>\n      <div id=\"light-status\">Loading...</div>\n    </div>\n    <div style=\"background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center;\">\n      <h3>🌡️ Climate</h3>\n      <div id=\"climate-status\">Loading...</div>\n    </div>\n    <div style=\"background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center;\">\n      <h3>🔒 Security</h3>\n      <div id=\"security-status\">Loading...</div>\n    </div>\n    <div style=\"background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center;\">\n      <h3>⚡ Energy</h3>\n      <div id=\"energy-status\">Loading...</div>\n    </div>\n  </div>\n  <div style=\"text-align: center; margin-top: 20px; font-size: 0.9em; opacity: 0.8;\">\n    System Status: <span id=\"system-status\">Online</span> | Last Update: <span id=\"last-update\">{{msg.payload.state.system.lastUpdate}}</span>\n  </div>\n</div>\n\n<script>\n// Update status displays when data changes\n(function(scope) {\n    scope.$watch('msg', function(msg) {\n        if (msg && msg.payload && msg.payload.state) {\n            var state = msg.payload.state;\n            \n            // Update lighting status\n            var lightsOn = Object.values(state.lights).filter(light => light.state).length;\n            var totalLights = Object.keys(state.lights).length;\n            document.getElementById('light-status').innerHTML = lightsOn + '/' + totalLights + ' lights on';\n            \n            // Update climate status\n            document.getElementById('climate-status').innerHTML = state.climate.temperature + '°C (Target: ' + state.climate.targetTemp + '°C)';\n            \n            // Update security status\n            var securityStatus = state.security.alarmArmed ? 'Armed' : 'Disarmed';\n            document.getElementById('security-status').innerHTML = securityStatus;\n            \n            // Update energy status\n            document.getElementById('energy-status').innerHTML = state.energy.currentUsage + 'W';\n            \n            // Update system status\n            document.getElementById('system-status').innerHTML = state.system.status;\n            document.getElementById('last-update').innerHTML = new Date(state.system.lastUpdate).toLocaleTimeString();\n        }\n    });\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 600,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "light-control",
+        "type": "ui-button",
+        "z": "smart-home-tab",
+        "name": "Living Room Light",
+        "group": "ui-group-lights",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Living Room",
+        "tooltip": "Toggle living room light",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "lightbulb",
+        "payload": "{\"room\": \"livingRoom\", \"action\": \"toggle\"}",
+        "payloadType": "json",
+        "topic": "lights/control",
+        "topicType": "str",
+        "x": 200,
+        "y": 200,
+        "wires": [
+            [
+                "light-processor"
+            ]
+        ]
+    },
+    {
+        "id": "light-processor",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Process Light Control",
+        "func": "// Get current smart home state\nvar state = global.get('smartHomeState') || {};\nvar control = msg.payload;\n\n// Process light control\nif (state.lights && state.lights[control.room]) {\n    if (control.action === 'toggle') {\n        state.lights[control.room].state = !state.lights[control.room].state;\n    } else if (control.action === 'set') {\n        state.lights[control.room].state = control.state;\n        if (control.brightness) state.lights[control.room].brightness = control.brightness;\n        if (control.color) state.lights[control.room].color = control.color;\n    }\n    \n    // Update timestamp\n    state.system.lastUpdate = new Date().toISOString();\n    \n    // Store updated state\n    global.set('smartHomeState', state);\n    \n    // Prepare response\n    msg.payload = {\n        success: true,\n        room: control.room,\n        light: state.lights[control.room],\n        timestamp: state.system.lastUpdate\n    };\n    \n    msg.topic = 'lights/status';\n} else {\n    msg.payload = {\n        success: false,\n        error: 'Room not found'\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "ui-led-living",
+                "update-overview"
+            ]
+        ]
+    },
+    {
+        "id": "ui-led-living",
+        "type": "ui-led",
+        "z": "smart-home-tab",
+        "group": "ui-group-lights",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Living Room LED",
+        "label": "Living Room",
+        "color": "{{msg.payload.light.state ? msg.payload.light.color : '#666666'}}",
+        "x": 600,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "temp-control",
+        "type": "ui-slider",
+        "z": "smart-home-tab",
+        "name": "Temperature Control",
+        "label": "Target Temperature",
+        "tooltip": "Set target temperature",
+        "group": "ui-group-climate",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "climate/temperature",
+        "topicType": "str",
+        "min": 16,
+        "max": 30,
+        "step": 1,
+        "className": "",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "climate-processor"
+            ]
+        ]
+    },
+    {
+        "id": "climate-processor",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Process Climate Control",
+        "func": "// Get current smart home state\nvar state = global.get('smartHomeState') || {};\nvar targetTemp = msg.payload;\n\n// Update climate settings\nif (state.climate) {\n    state.climate.targetTemp = targetTemp;\n    \n    // Simulate temperature adjustment\n    var currentTemp = state.climate.temperature;\n    var diff = targetTemp - currentTemp;\n    \n    if (Math.abs(diff) > 0.5) {\n        state.climate.temperature += diff * 0.1; // Gradual adjustment\n    }\n    \n    // Update fan speed based on temperature difference\n    if (Math.abs(diff) > 2) {\n        state.climate.fanSpeed = Math.min(100, Math.abs(diff) * 20);\n    } else {\n        state.climate.fanSpeed = 0;\n    }\n    \n    // Update timestamp\n    state.system.lastUpdate = new Date().toISOString();\n    \n    // Store updated state\n    global.set('smartHomeState', state);\n    \n    // Prepare response\n    msg.payload = {\n        success: true,\n        climate: state.climate,\n        timestamp: state.system.lastUpdate\n    };\n    \n    msg.topic = 'climate/status';\n} else {\n    msg.payload = {\n        success: false,\n        error: 'Climate system not initialized'\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "ui-gauge-temp",
+                "ui-text-fan",
+                "update-overview"
+            ]
+        ]
+    },
+    {
+        "id": "ui-gauge-temp",
+        "type": "ui-gauge",
+        "z": "smart-home-tab",
+        "name": "Temperature Gauge",
+        "group": "ui-group-climate",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Current Temperature",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 16,
+        "max": 30,
+        "colors": [
+            "#0080ff",
+            "#00ff00",
+            "#ff8000"
+        ],
+        "seg1": "18",
+        "seg2": "26",
+        "className": "",
+        "x": 600,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "ui-text-fan",
+        "type": "ui-text",
+        "z": "smart-home-tab",
+        "group": "ui-group-climate",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Fan Status",
+        "label": "Fan Speed:",
+        "format": "{{msg.payload.climate.fanSpeed}}%",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 16,
+        "color": "{{msg.payload.climate.fanSpeed > 0 ? '#00ff00' : '#666666'}}",
+        "className": "",
+        "x": 600,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "security-switch",
+        "type": "ui-switch",
+        "z": "smart-home-tab",
+        "name": "Alarm System",
+        "label": "Alarm System",
+        "tooltip": "Arm/disarm security system",
+        "group": "ui-group-security",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": false,
+        "topic": "security/alarm",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "armed",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "disarmed",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 200,
+        "y": 400,
+        "wires": [
+            [
+                "security-processor"
+            ]
+        ]
+    },
+    {
+        "id": "security-processor",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Process Security Control",
+        "func": "// Get current smart home state\nvar state = global.get('smartHomeState') || {};\nvar alarmState = msg.payload === 'armed';\n\n// Update security settings\nif (state.security) {\n    state.security.alarmArmed = alarmState;\n    \n    // Update timestamp\n    state.system.lastUpdate = new Date().toISOString();\n    \n    // Store updated state\n    global.set('smartHomeState', state);\n    \n    // Prepare response\n    msg.payload = {\n        success: true,\n        security: state.security,\n        timestamp: state.system.lastUpdate\n    };\n    \n    msg.topic = 'security/status';\n} else {\n    msg.payload = {\n        success: false,\n        error: 'Security system not initialized'\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "ui-text-security",
+                "update-overview"
+            ]
+        ]
+    },
+    {
+        "id": "ui-text-security",
+        "type": "ui-text",
+        "z": "smart-home-tab",
+        "group": "ui-group-security",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Security Status",
+        "label": "Status:",
+        "format": "{{msg.payload.security.alarmArmed ? 'Armed' : 'Disarmed'}}",
+        "layout": "row-spread",
+        "font": "",
+        "fontSize": 16,
+        "color": "{{msg.payload.security.alarmArmed ? '#ff0000' : '#00ff00'}}",
+        "className": "",
+        "x": 600,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "energy-monitor",
+        "type": "inject",
+        "z": "smart-home-tab",
+        "name": "Update Energy",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 500,
+        "wires": [
+            [
+                "energy-simulator"
+            ]
+        ]
+    },
+    {
+        "id": "energy-simulator",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Energy Usage Simulator",
+        "func": "// Get current smart home state\nvar state = global.get('smartHomeState') || {};\n\n// Simulate energy usage based on current state\nvar baseUsage = 50; // Base usage in watts\nvar lightUsage = 0;\nvar climateUsage = 0;\n\n// Calculate light usage\nif (state.lights) {\n    Object.values(state.lights).forEach(light => {\n        if (light.state) {\n            lightUsage += light.brightness * 0.1; // 0.1W per brightness unit\n        }\n    });\n}\n\n// Calculate climate usage\nif (state.climate) {\n    climateUsage = state.climate.fanSpeed * 0.5; // 0.5W per fan speed unit\n    if (Math.abs(state.climate.targetTemp - state.climate.temperature) > 1) {\n        climateUsage += 100; // AC/Heating usage\n    }\n}\n\n// Update energy data\nif (state.energy) {\n    state.energy.currentUsage = Math.round(baseUsage + lightUsage + climateUsage);\n    state.energy.dailyUsage += state.energy.currentUsage * 0.001; // Convert to kWh\n    state.energy.solarProduction = Math.random() * 200; // Simulate solar production\n    \n    // Update timestamp\n    state.system.lastUpdate = new Date().toISOString();\n    \n    // Store updated state\n    global.set('smartHomeState', state);\n    \n    // Prepare response\n    msg.payload = {\n        success: true,\n        energy: state.energy,\n        timestamp: state.system.lastUpdate\n    };\n    \n    msg.topic = 'energy/status';\n} else {\n    msg.payload = {\n        success: false,\n        error: 'Energy monitoring not initialized'\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 500,
+        "wires": [
+            [
+                "ui-gauge-energy",
+                "ui-chart-energy",
+                "update-overview"
+            ]
+        ]
+    },
+    {
+        "id": "ui-gauge-energy",
+        "type": "ui-gauge",
+        "z": "smart-home-tab",
+        "name": "Energy Usage Gauge",
+        "group": "ui-group-energy",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Current Usage",
+        "label": "W",
+        "format": "{{value}}",
+        "min": 0,
+        "max": 500,
+        "colors": [
+            "#00ff00",
+            "#ffff00",
+            "#ff0000"
+        ],
+        "seg1": "200",
+        "seg2": "350",
+        "className": "",
+        "x": 600,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "ui-chart-energy",
+        "type": "ui-chart",
+        "z": "smart-home-tab",
+        "name": "Energy Usage Chart",
+        "group": "ui-group-energy",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Energy Usage Over Time",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "No data available",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "500",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "pie": {
+            "valueCol": "y",
+            "labelCol": "x",
+            "showLegend": "true"
+        },
+        "className": "",
+        "x": 600,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "update-overview",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Update Overview",
+        "func": "// Get current smart home state\nvar state = global.get('smartHomeState') || {};\n\n// Prepare overview update message\nmsg.payload = {\n    message: 'Smart Home State Updated',\n    state: state\n};\n\nmsg.topic = 'system/update';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 600,
+        "wires": [
+            [
+                "ui-template-overview"
+            ]
+        ]
+    },
+    {
+        "id": "system-settings",
+        "type": "ui-form",
+        "z": "smart-home-tab",
+        "name": "System Configuration",
+        "label": "Configure System",
+        "group": "ui-group-settings",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "formValue": "{\n  \"systemName\": \"My Smart Home\",\n  \"location\": \"Home\",\n  \"timezone\": \"UTC\",\n  \"autoMode\": true,\n  \"notifications\": true,\n  \"energySaving\": false\n}",
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "system/config",
+        "topicType": "str",
+        "splitLayout": "",
+        "className": "",
+        "x": 200,
+        "y": 700,
+        "wires": [
+            [
+                "settings-processor"
+            ]
+        ]
+    },
+    {
+        "id": "settings-processor",
+        "type": "function",
+        "z": "smart-home-tab",
+        "name": "Process Settings",
+        "func": "// Process system settings\nvar settings = msg.payload;\nvar state = global.get('smartHomeState') || {};\n\n// Update system settings\nif (!state.system) state.system = {};\nstate.system.name = settings.systemName || 'Smart Home';\nstate.system.location = settings.location || 'Home';\nstate.system.timezone = settings.timezone || 'UTC';\nstate.system.autoMode = settings.autoMode === true || settings.autoMode === 'true';\nstate.system.notifications = settings.notifications === true || settings.notifications === 'true';\nstate.system.energySaving = settings.energySaving === true || settings.energySaving === 'true';\nstate.system.lastUpdate = new Date().toISOString();\n\n// Store updated state\nglobal.set('smartHomeState', state);\n\n// Prepare response\nmsg.payload = {\n    success: true,\n    message: 'System settings updated successfully',\n    settings: state.system\n};\n\nmsg.topic = 'system/settings/response';\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 700,
+        "wires": [
+            [
+                "ui-notification-settings"
+            ]
+        ]
+    },
+    {
+        "id": "ui-notification-settings",
+        "type": "ui-notification",
+        "z": "smart-home-tab",
+        "name": "Settings Notification",
+        "group": "ui-group-settings",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "topicType": "str",
+        "okType": "str",
+        "cancelType": "str",
+        "raw": false,
+        "className": "",
+        "x": 600,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    }
+]

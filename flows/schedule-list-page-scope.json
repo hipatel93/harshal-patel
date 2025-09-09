@@ -1,0 +1,300 @@
+[
+    {
+        "id": "schedule-page-tab",
+        "type": "tab",
+        "label": "Schedule List Page Scope",
+        "disabled": false,
+        "info": "Page scope implementation for schedule list with different screen areas"
+    },
+    {
+        "id": "ui-base-schedule",
+        "type": "ui-base",
+        "z": "schedule-page-tab",
+        "name": "Schedule Dashboard",
+        "path": "/schedule",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "navigationStyle": "default"
+    },
+    {
+        "id": "ui-tab-schedule",
+        "type": "ui-tab",
+        "z": "schedule-page-tab",
+        "name": "Production Schedule",
+        "icon": "schedule",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui-group-schedule-list",
+        "type": "ui-group",
+        "z": "schedule-page-tab",
+        "name": "Schedule List Area",
+        "tab": "ui-tab-schedule",
+        "order": 1,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": "schedule-list-group"
+    },
+    {
+        "id": "ui-group-control-buttons",
+        "type": "ui-group",
+        "z": "schedule-page-tab",
+        "name": "Control Buttons",
+        "tab": "ui-tab-schedule",
+        "order": 2,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": "control-buttons-group"
+    },
+    {
+        "id": "ui-group-machine-display",
+        "type": "ui-group",
+        "z": "schedule-page-tab",
+        "name": "Machine Status",
+        "tab": "ui-tab-schedule",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": "machine-display-group"
+    },
+    {
+        "id": "ui-group-history",
+        "type": "ui-group",
+        "z": "schedule-page-tab",
+        "name": "History & Logs",
+        "tab": "ui-tab-schedule",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": "history-group"
+    },
+    {
+        "id": "ui-template-schedule-list",
+        "type": "ui-template",
+        "z": "schedule-page-tab",
+        "group": "ui-group-schedule-list",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Schedule List Display",
+        "label": "Production Schedule",
+        "format": "<div id=\"schedule-list-container\" class=\"schedule-container\">\n  <div v-for=\"(lineData, key) in allLineData\" :key=\"key\" class=\"line-wrapper\">\n    \n    <!-- Empty Line -->\n    <div v-if=\"lineData.LineType === 0\" class=\"line-item empty-line\">\n      <div class=\"line-content\"></div>\n    </div>\n    \n    <!-- Order Line -->\n    <div v-else-if=\"lineData.LineType === 1\" class=\"line-item order-line\" @click=\"handleLineClick(key, lineData)\">\n      <div class=\"line-content order-content\">\n        <div class=\"order-info\">\n          <span class=\"order-number\">{{ lineData.OrderNo }}</span>\n          <span class=\"order-id\">ID-{{ lineData.OrderKeyID }}</span>\n          <span class=\"order-date\">{{ lineData.OrderDate }}</span>\n        </div>\n        <div class=\"line-actions\">\n          <button class=\"action-btn edit-btn\" @click.stop=\"handleAction('editorder', key, lineData)\">EDIT</button>\n          <button class=\"action-btn delete-btn\" @click.stop=\"handleAction('deleteorder', key, lineData)\">DELETE</button>\n          <button class=\"action-btn print-btn\" @click.stop=\"handleAction('printorderlabel', key, lineData)\">PRINT</button>\n          <button class=\"action-btn run-btn\" @click.stop=\"handleAction('RunOrder', key, lineData)\">RUN</button>\n        </div>\n      </div>\n    </div>\n    \n    <!-- List Line -->\n    <div v-else-if=\"lineData.LineType === 2\" class=\"line-item list-line\" @click=\"handleLineClick(key, lineData)\">\n      <div class=\"line-content list-content\">\n        <div class=\"list-info\">\n          <span class=\"product-code\">{{ lineData.ProductCode }}</span>\n          <span class=\"length\">{{ lineData.Length }}</span>\n          <span class=\"qty\">{{ lineData.Qty }}</span>\n          <span class=\"done-qty\">{{ lineData.DoneQty }}</span>\n          <span class=\"status\" :class=\"getStatusClass(lineData.LineStatus)\">{{ lineData.LineStatus }}</span>\n          <i v-if=\"lineData.LineStatus==='Completed'\" class=\"status-icon completed\">✓</i>\n          <i v-else-if=\"lineData.LineStatus==='In Progress'\" class=\"status-icon in-progress\">●</i>\n        </div>\n        <div class=\"line-actions\">\n          <button class=\"action-btn edit-btn\" @click.stop=\"handleAction('edit', key, lineData)\">EDIT</button>\n          <button class=\"action-btn delete-btn\" @click.stop=\"handleAction('delete', key, lineData)\">DELETE</button>\n          <button class=\"action-btn done-btn\" @click.stop=\"handleAction('markdone', key, lineData)\">DONE</button>\n          <button class=\"action-btn add-btn\" @click.stop=\"handleAction('add', key, lineData)\">ADD</button>\n          <button class=\"action-btn copy-btn\" @click.stop=\"handleAction('copy', key, lineData)\">COPY</button>\n          <button class=\"action-btn run-btn\" @click.stop=\"handleAction('run', key, lineData)\">RUN</button>\n        </div>\n      </div>\n    </div>\n    \n    <!-- End of List -->\n    <div v-else-if=\"lineData.LineType === 3\" class=\"line-item end-line\">\n      <div class=\"line-content end-content\">\n        <span class=\"end-text\">----- END OF THE LIST -----</span>\n      </div>\n    </div>\n    \n  </div>\n</div>\n\n<style>\n.schedule-container {\n  max-height: 400px;\n  overflow-y: auto;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  background: #f9f9f9;\n}\n\n.line-wrapper {\n  margin-bottom: 1px;\n}\n\n.line-item {\n  cursor: pointer;\n  transition: background-color 0.2s;\n}\n\n.line-item:hover {\n  background-color: #e3f2fd;\n}\n\n.line-content {\n  padding: 8px 12px;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  min-height: 40px;\n}\n\n/* Line Type Styles */\n.empty-line {\n  background-color: #c5c6c5;\n  height: 12px;\n}\n\n.order-line {\n  background-color: #ffda31;\n  color: black;\n  font-weight: bold;\n}\n\n.list-line {\n  background-color: #9c999c;\n  color: black;\n}\n\n.end-line {\n  background-color: #cf6679;\n  color: black;\n  font-weight: bold;\n  text-align: center;\n}\n\n/* Content Layouts */\n.order-info {\n  display: flex;\n  gap: 20px;\n  align-items: center;\n}\n\n.list-info {\n  display: flex;\n  gap: 15px;\n  align-items: center;\n}\n\n.end-content {\n  justify-content: center;\n}\n\n/* Action Buttons */\n.line-actions {\n  display: flex;\n  gap: 5px;\n}\n\n.action-btn {\n  padding: 4px 8px;\n  border: none;\n  border-radius: 3px;\n  font-size: 10px;\n  font-weight: bold;\n  cursor: pointer;\n  transition: opacity 0.2s;\n}\n\n.action-btn:hover {\n  opacity: 0.8;\n}\n\n.edit-btn { background-color: #1976d2; color: white; }\n.delete-btn { background-color: #d32f2f; color: white; }\n.done-btn { background-color: #7b1fa2; color: white; }\n.add-btn { background-color: #388e3c; color: white; }\n.copy-btn { background-color: #0288d1; color: white; }\n.run-btn { background-color: #f57c00; color: white; }\n.print-btn { background-color: #795548; color: white; }\n\n/* Status Styles */\n.status.completed { color: #00dac5; }\n.status.in-progress { color: #cf6679; }\n\n.status-icon {\n  font-size: 16px;\n  margin-left: 5px;\n}\n\n.status-icon.completed { color: #00dac5; }\n.status-icon.in-progress { color: #cf6679; }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "action-processor"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-control-panel",
+        "type": "ui-template",
+        "z": "schedule-page-tab",
+        "group": "ui-group-control-buttons",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Control Panel",
+        "label": "Quick Actions",
+        "format": "<div class=\"control-panel\">\n  <h3>Quick Actions</h3>\n  <div class=\"control-buttons\">\n    <button class=\"control-btn primary\" @click=\"handleControlAction('refresh')\">\n      <i class=\"icon\">🔄</i>\n      <span>Refresh</span>\n    </button>\n    <button class=\"control-btn success\" @click=\"handleControlAction('add-new')\">\n      <i class=\"icon\">➕</i>\n      <span>Add New</span>\n    </button>\n    <button class=\"control-btn warning\" @click=\"handleControlAction('pause-all')\">\n      <i class=\"icon\">⏸️</i>\n      <span>Pause All</span>\n    </button>\n    <button class=\"control-btn danger\" @click=\"handleControlAction('emergency-stop')\">\n      <i class=\"icon\">🛑</i>\n      <span>Emergency Stop</span>\n    </button>\n  </div>\n  \n  <div class=\"status-summary\">\n    <h4>Status Summary</h4>\n    <div class=\"status-item\">\n      <span class=\"label\">Total Orders:</span>\n      <span class=\"value\">{{ statusSummary.totalOrders }}</span>\n    </div>\n    <div class=\"status-item\">\n      <span class=\"label\">In Progress:</span>\n      <span class=\"value in-progress\">{{ statusSummary.inProgress }}</span>\n    </div>\n    <div class=\"status-item\">\n      <span class=\"label\">Completed:</span>\n      <span class=\"value completed\">{{ statusSummary.completed }}</span>\n    </div>\n  </div>\n</div>\n\n<style>\n.control-panel {\n  padding: 15px;\n  background: #f5f5f5;\n  border-radius: 8px;\n}\n\n.control-panel h3 {\n  margin-top: 0;\n  color: #333;\n  font-size: 16px;\n}\n\n.control-buttons {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 10px;\n  margin-bottom: 20px;\n}\n\n.control-btn {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 12px 8px;\n  border: none;\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.2s;\n  font-size: 12px;\n  font-weight: bold;\n}\n\n.control-btn:hover {\n  transform: translateY(-2px);\n  box-shadow: 0 4px 8px rgba(0,0,0,0.2);\n}\n\n.control-btn .icon {\n  font-size: 20px;\n  margin-bottom: 4px;\n}\n\n.control-btn.primary { background-color: #2196f3; color: white; }\n.control-btn.success { background-color: #4caf50; color: white; }\n.control-btn.warning { background-color: #ff9800; color: white; }\n.control-btn.danger { background-color: #f44336; color: white; }\n\n.status-summary {\n  border-top: 1px solid #ddd;\n  padding-top: 15px;\n}\n\n.status-summary h4 {\n  margin: 0 0 10px 0;\n  color: #333;\n  font-size: 14px;\n}\n\n.status-item {\n  display: flex;\n  justify-content: space-between;\n  margin-bottom: 5px;\n  font-size: 12px;\n}\n\n.status-item .label {\n  color: #666;\n}\n\n.status-item .value {\n  font-weight: bold;\n}\n\n.status-item .value.in-progress {\n  color: #ff9800;\n}\n\n.status-item .value.completed {\n  color: #4caf50;\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "control-processor"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-machine-status",
+        "type": "ui-template",
+        "z": "schedule-page-tab",
+        "group": "ui-group-machine-display",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Machine Status Display",
+        "label": "Machine Status",
+        "format": "<div class=\"machine-status\">\n  <h3>Machine Status</h3>\n  <div class=\"machine-grid\">\n    <div v-for=\"machine in machines\" :key=\"machine.id\" class=\"machine-card\" :class=\"machine.status\">\n      <div class=\"machine-header\">\n        <h4>{{ machine.name }}</h4>\n        <span class=\"status-indicator\" :class=\"machine.status\"></span>\n      </div>\n      <div class=\"machine-info\">\n        <div class=\"info-item\">\n          <span class=\"label\">Status:</span>\n          <span class=\"value\">{{ machine.statusText }}</span>\n        </div>\n        <div class=\"info-item\">\n          <span class=\"label\">Current Job:</span>\n          <span class=\"value\">{{ machine.currentJob || 'None' }}</span>\n        </div>\n        <div class=\"info-item\">\n          <span class=\"label\">Progress:</span>\n          <span class=\"value\">{{ machine.progress }}%</span>\n        </div>\n        <div class=\"info-item\">\n          <span class=\"label\">Uptime:</span>\n          <span class=\"value\">{{ machine.uptime }}</span>\n        </div>\n      </div>\n      <div class=\"machine-actions\">\n        <button class=\"machine-btn\" @click=\"handleMachineAction('start', machine.id)\" v-if=\"machine.status === 'stopped'\">Start</button>\n        <button class=\"machine-btn\" @click=\"handleMachineAction('stop', machine.id)\" v-if=\"machine.status === 'running'\">Stop</button>\n        <button class=\"machine-btn\" @click=\"handleMachineAction('pause', machine.id)\" v-if=\"machine.status === 'running'\">Pause</button>\n        <button class=\"machine-btn\" @click=\"handleMachineAction('resume', machine.id)\" v-if=\"machine.status === 'paused'\">Resume</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<style>\n.machine-status {\n  padding: 15px;\n  background: #f9f9f9;\n  border-radius: 8px;\n}\n\n.machine-status h3 {\n  margin-top: 0;\n  color: #333;\n  font-size: 16px;\n}\n\n.machine-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n  gap: 15px;\n}\n\n.machine-card {\n  background: white;\n  border-radius: 6px;\n  padding: 12px;\n  border-left: 4px solid;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n}\n\n.machine-card.running {\n  border-left-color: #4caf50;\n}\n\n.machine-card.stopped {\n  border-left-color: #f44336;\n}\n\n.machine-card.paused {\n  border-left-color: #ff9800;\n}\n\n.machine-card.error {\n  border-left-color: #9c27b0;\n}\n\n.machine-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 10px;\n}\n\n.machine-header h4 {\n  margin: 0;\n  font-size: 14px;\n  color: #333;\n}\n\n.status-indicator {\n  width: 10px;\n  height: 10px;\n  border-radius: 50%;\n}\n\n.status-indicator.running {\n  background-color: #4caf50;\n}\n\n.status-indicator.stopped {\n  background-color: #f44336;\n}\n\n.status-indicator.paused {\n  background-color: #ff9800;\n}\n\n.status-indicator.error {\n  background-color: #9c27b0;\n}\n\n.machine-info {\n  margin-bottom: 10px;\n}\n\n.info-item {\n  display: flex;\n  justify-content: space-between;\n  margin-bottom: 4px;\n  font-size: 12px;\n}\n\n.info-item .label {\n  color: #666;\n}\n\n.info-item .value {\n  font-weight: bold;\n  color: #333;\n}\n\n.machine-actions {\n  display: flex;\n  gap: 5px;\n}\n\n.machine-btn {\n  padding: 4px 8px;\n  border: none;\n  border-radius: 3px;\n  font-size: 10px;\n  cursor: pointer;\n  background-color: #2196f3;\n  color: white;\n}\n\n.machine-btn:hover {\n  opacity: 0.8;\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "machine-processor"
+            ]
+        ]
+    },
+    {
+        "id": "ui-template-history",
+        "type": "ui-template",
+        "z": "schedule-page-tab",
+        "group": "ui-group-history",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "History & Logs",
+        "label": "Activity History",
+        "format": "<div class=\"history-container\">\n  <h3>Activity History</h3>\n  <div class=\"history-controls\">\n    <button class=\"history-btn\" @click=\"filterHistory('all')\" :class=\"{ active: currentFilter === 'all' }\">All</button>\n    <button class=\"history-btn\" @click=\"filterHistory('actions')\" :class=\"{ active: currentFilter === 'actions' }\">Actions</button>\n    <button class=\"history-btn\" @click=\"filterHistory('errors')\" :class=\"{ active: currentFilter === 'errors' }\">Errors</button>\n    <button class=\"history-btn\" @click=\"clearHistory()\">Clear</button>\n  </div>\n  <div class=\"history-list\">\n    <div v-for=\"(entry, index) in filteredHistory\" :key=\"index\" class=\"history-entry\" :class=\"entry.type\">\n      <div class=\"entry-time\">{{ formatTime(entry.timestamp) }}</div>\n      <div class=\"entry-content\">\n        <div class=\"entry-message\">{{ entry.message }}</div>\n        <div class=\"entry-details\" v-if=\"entry.details\">{{ entry.details }}</div>\n      </div>\n      <div class=\"entry-type\">\n        <span class=\"type-badge\" :class=\"entry.type\">{{ entry.type.toUpperCase() }}</span>\n      </div>\n    </div>\n    <div v-if=\"filteredHistory.length === 0\" class=\"no-history\">\n      No history entries found\n    </div>\n  </div>\n</div>\n\n<style>\n.history-container {\n  padding: 15px;\n  background: #f9f9f9;\n  border-radius: 8px;\n  height: 300px;\n  display: flex;\n  flex-direction: column;\n}\n\n.history-container h3 {\n  margin-top: 0;\n  color: #333;\n  font-size: 16px;\n}\n\n.history-controls {\n  display: flex;\n  gap: 5px;\n  margin-bottom: 15px;\n}\n\n.history-btn {\n  padding: 4px 8px;\n  border: 1px solid #ddd;\n  border-radius: 3px;\n  background: white;\n  cursor: pointer;\n  font-size: 11px;\n  transition: all 0.2s;\n}\n\n.history-btn:hover {\n  background-color: #f0f0f0;\n}\n\n.history-btn.active {\n  background-color: #2196f3;\n  color: white;\n  border-color: #2196f3;\n}\n\n.history-list {\n  flex: 1;\n  overflow-y: auto;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  background: white;\n}\n\n.history-entry {\n  display: flex;\n  padding: 8px 12px;\n  border-bottom: 1px solid #eee;\n  font-size: 12px;\n}\n\n.history-entry:last-child {\n  border-bottom: none;\n}\n\n.history-entry.info {\n  border-left: 3px solid #2196f3;\n}\n\n.history-entry.warning {\n  border-left: 3px solid #ff9800;\n}\n\n.history-entry.error {\n  border-left: 3px solid #f44336;\n}\n\n.history-entry.success {\n  border-left: 3px solid #4caf50;\n}\n\n.entry-time {\n  min-width: 60px;\n  color: #666;\n  font-size: 10px;\n}\n\n.entry-content {\n  flex: 1;\n  margin: 0 10px;\n}\n\n.entry-message {\n  font-weight: bold;\n  color: #333;\n}\n\n.entry-details {\n  color: #666;\n  font-size: 11px;\n  margin-top: 2px;\n}\n\n.entry-type {\n  min-width: 50px;\n  text-align: right;\n}\n\n.type-badge {\n  padding: 2px 6px;\n  border-radius: 3px;\n  font-size: 9px;\n  font-weight: bold;\n}\n\n.type-badge.info {\n  background-color: #e3f2fd;\n  color: #1976d2;\n}\n\n.type-badge.warning {\n  background-color: #fff3e0;\n  color: #f57c00;\n}\n\n.type-badge.error {\n  background-color: #ffebee;\n  color: #d32f2f;\n}\n\n.type-badge.success {\n  background-color: #e8f5e8;\n  color: #388e3c;\n}\n\n.no-history {\n  text-align: center;\n  color: #666;\n  padding: 20px;\n  font-style: italic;\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "history-processor"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-data-generator",
+        "type": "inject",
+        "z": "schedule-page-tab",
+        "name": "Generate Schedule Data",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "schedule-data-processor"
+            ]
+        ]
+    },
+    {
+        "id": "schedule-data-processor",
+        "type": "function",
+        "z": "schedule-page-tab",
+        "name": "Generate Schedule Data",
+        "func": "// Generate sample schedule data\nvar scheduleData = {\n    LineData1: {\n        LineType: 0, // Empty line\n        ScheduleListKeyID: null\n    },\n    LineData2: {\n        LineType: 1, // Order line\n        ScheduleListKeyID: 1001,\n        OrderNo: \"ORD-2024-001\",\n        OrderKeyID: 1001,\n        OrderDate: \"2024-01-15\"\n    },\n    LineData3: {\n        LineType: 2, // List line\n        ScheduleListKeyID: 2001,\n        ProductCode: \"PROD-A001\",\n        Length: \"1200mm\",\n        Qty: 50,\n        DoneQty: 25,\n        LineStatus: \"In Progress\"\n    },\n    LineData4: {\n        LineType: 2, // List line\n        ScheduleListKeyID: 2002,\n        ProductCode: \"PROD-B002\",\n        Length: \"800mm\",\n        Qty: 30,\n        DoneQty: 30,\n        LineStatus: \"Completed\"\n    },\n    LineData5: {\n        LineType: 2, // List line\n        ScheduleListKeyID: 2003,\n        ProductCode: \"PROD-C003\",\n        Length: \"1500mm\",\n        Qty: 20,\n        DoneQty: 0,\n        LineStatus: \"Pending\"\n    },\n    LineData6: {\n        LineType: 3, // End of list\n        ScheduleListKeyID: null\n    }\n};\n\n// Generate machine status data\nvar machineData = {\n    machines: [\n        {\n            id: \"M001\",\n            name: \"Machine 1\",\n            status: \"running\",\n            statusText: \"Running\",\n            currentJob: \"PROD-A001\",\n            progress: 75,\n            uptime: \"2h 30m\"\n        },\n        {\n            id: \"M002\",\n            name: \"Machine 2\",\n            status: \"stopped\",\n            statusText: \"Stopped\",\n            currentJob: null,\n            progress: 0,\n            uptime: \"0h 0m\"\n        },\n        {\n            id: \"M003\",\n            name: \"Machine 3\",\n            status: \"paused\",\n            statusText: \"Paused\",\n            currentJob: \"PROD-C003\",\n            progress: 45,\n            uptime: \"1h 15m\"\n        }\n    ]\n};\n\n// Generate status summary\nvar statusSummary = {\n    totalOrders: 3,\n    inProgress: 1,\n    completed: 1,\n    pending: 1\n};\n\n// Prepare message\nmsg.payload = {\n    ...scheduleData,\n    ...machineData,\n    statusSummary: statusSummary,\n    timestamp: new Date().toISOString()\n};\n\nmsg.topic = \"schedule/update\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "ui-template-schedule-list",
+                "ui-template-control-panel",
+                "ui-template-machine-status",
+                "ui-template-history"
+            ]
+        ]
+    },
+    {
+        "id": "action-processor",
+        "type": "function",
+        "z": "schedule-page-tab",
+        "name": "Process Schedule Actions",
+        "func": "// Process actions from schedule list\nvar action = msg.payload;\n\n// Log the action\nnode.log(`Schedule Action: ${action.action} on line ${action.lineKey}`);\n\n// Add to history\nvar historyEntry = {\n    type: 'info',\n    message: `Action: ${action.action}`,\n    details: `Line: ${action.lineKey}, KeyID: ${action.keyID}`,\n    timestamp: new Date().toISOString()\n};\n\n// Store in global context\nvar history = global.get('scheduleHistory') || [];\nhistory.unshift(historyEntry);\nif (history.length > 100) {\n    history = history.slice(0, 100);\n}\nglobal.set('scheduleHistory', history);\n\n// Process specific actions\nswitch (action.action) {\n    case 'editorder':\n    case 'edit':\n        msg.payload = {\n            success: true,\n            message: 'Edit action processed',\n            action: action.action,\n            lineKey: action.lineKey,\n            keyID: action.keyID\n        };\n        break;\n        \n    case 'deleteorder':\n    case 'delete':\n        msg.payload = {\n            success: true,\n            message: 'Delete action processed',\n            action: action.action,\n            lineKey: action.lineKey,\n            keyID: action.keyID\n        };\n        break;\n        \n    case 'markdone':\n        msg.payload = {\n            success: true,\n            message: 'Mark done action processed',\n            action: action.action,\n            lineKey: action.lineKey,\n            keyID: action.keyID\n        };\n        break;\n        \n    case 'run':\n    case 'RunOrder':\n        msg.payload = {\n            success: true,\n            message: 'Run action processed',\n            action: action.action,\n            lineKey: action.lineKey,\n            keyID: action.keyID\n        };\n        break;\n        \n    default:\n        msg.payload = {\n            success: false,\n            message: 'Unknown action',\n            action: action.action\n        };\n}\n\nmsg.topic = `schedule/action/${action.action}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 100,
+        "wires": [
+            [
+                "ui-template-history"
+            ]
+        ]
+    },
+    {
+        "id": "control-processor",
+        "type": "function",
+        "z": "schedule-page-tab",
+        "name": "Process Control Actions",
+        "func": "// Process control panel actions\nvar action = msg.payload;\n\n// Log the action\nnode.log(`Control Action: ${action.action}`);\n\n// Add to history\nvar historyEntry = {\n    type: 'info',\n    message: `Control: ${action.action}`,\n    details: `Action performed from control panel`,\n    timestamp: new Date().toISOString()\n};\n\n// Store in global context\nvar history = global.get('scheduleHistory') || [];\nhistory.unshift(historyEntry);\nif (history.length > 100) {\n    history = history.slice(0, 100);\n}\nglobal.set('scheduleHistory', history);\n\n// Process specific control actions\nswitch (action.action) {\n    case 'refresh':\n        msg.payload = {\n            success: true,\n            message: 'Schedule refreshed',\n            action: action.action\n        };\n        break;\n        \n    case 'add-new':\n        msg.payload = {\n            success: true,\n            message: 'Add new item dialog opened',\n            action: action.action\n        };\n        break;\n        \n    case 'pause-all':\n        msg.payload = {\n            success: true,\n            message: 'All operations paused',\n            action: action.action\n        };\n        break;\n        \n    case 'emergency-stop':\n        msg.payload = {\n            success: true,\n            message: 'Emergency stop activated',\n            action: action.action\n        };\n        historyEntry.type = 'error';\n        break;\n        \n    default:\n        msg.payload = {\n            success: false,\n            message: 'Unknown control action',\n            action: action.action\n        };\n}\n\nmsg.topic = `control/action/${action.action}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 200,
+        "wires": [
+            [
+                "ui-template-history"
+            ]
+        ]
+    },
+    {
+        "id": "machine-processor",
+        "type": "function",
+        "z": "schedule-page-tab",
+        "name": "Process Machine Actions",
+        "func": "// Process machine control actions\nvar action = msg.payload;\n\n// Log the action\nnode.log(`Machine Action: ${action.action} on machine ${action.machineId}`);\n\n// Add to history\nvar historyEntry = {\n    type: 'info',\n    message: `Machine ${action.machineId}: ${action.action}`,\n    details: `Machine control action performed`,\n    timestamp: new Date().toISOString()\n};\n\n// Store in global context\nvar history = global.get('scheduleHistory') || [];\nhistory.unshift(historyEntry);\nif (history.length > 100) {\n    history = history.slice(0, 100);\n}\nglobal.set('scheduleHistory', history);\n\n// Process specific machine actions\nswitch (action.action) {\n    case 'start':\n        msg.payload = {\n            success: true,\n            message: `Machine ${action.machineId} started`,\n            action: action.action,\n            machineId: action.machineId\n        };\n        break;\n        \n    case 'stop':\n        msg.payload = {\n            success: true,\n            message: `Machine ${action.machineId} stopped`,\n            action: action.action,\n            machineId: action.machineId\n        };\n        break;\n        \n    case 'pause':\n        msg.payload = {\n            success: true,\n            message: `Machine ${action.machineId} paused`,\n            action: action.action,\n            machineId: action.machineId\n        };\n        break;\n        \n    case 'resume':\n        msg.payload = {\n            success: true,\n            message: `Machine ${action.machineId} resumed`,\n            action: action.action,\n            machineId: action.machineId\n        };\n        break;\n        \n    default:\n        msg.payload = {\n            success: false,\n            message: 'Unknown machine action',\n            action: action.action\n        };\n}\n\nmsg.topic = `machine/action/${action.action}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "ui-template-history"
+            ]
+        ]
+    },
+    {
+        "id": "history-processor",
+        "type": "function",
+        "z": "schedule-page-tab",
+        "name": "Process History Actions",
+        "func": "// Process history panel actions\nvar action = msg.payload;\n\n// Log the action\nnode.log(`History Action: ${action.action}`);\n\n// Process specific history actions\nswitch (action.action) {\n    case 'filter':\n        msg.payload = {\n            success: true,\n            message: `History filtered by: ${action.filter}`,\n            action: action.action,\n            filter: action.filter\n        };\n        break;\n        \n    case 'clear':\n        // Clear history\n        global.set('scheduleHistory', []);\n        msg.payload = {\n            success: true,\n            message: 'History cleared',\n            action: action.action\n        };\n        break;\n        \n    default:\n        msg.payload = {\n            success: false,\n            message: 'Unknown history action',\n            action: action.action\n        };\n}\n\nmsg.topic = `history/action/${action.action}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 400,
+        "wires": [
+            [
+                "ui-template-history"
+            ]
+        ]
+    }
+]
